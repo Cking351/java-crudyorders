@@ -71,4 +71,65 @@ public class CustomerServicesImpl implements CustomerServices {
 
         return custrepos.save(newCustomer);
     }
+
+
+    @Override
+    public Customer update(Customer customer, long id) {
+        Customer currentCustomer = custrepos.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Customer " + id + " Not Found!"));
+
+
+        // VALIDATION FOR BASE FIELDS
+        if (customer.getCustname() != null) {
+            currentCustomer.setCustname(customer.getCustname());
+        }
+        if (customer.getCustcity() != null) {
+            currentCustomer.setCustcity(customer.getCustcity());
+        }
+        if (customer.getCustcountry() != null) {
+            currentCustomer.setCustcountry(customer.getCustcountry());
+        }
+        if (customer.getWorkingarea() != null) {
+            currentCustomer.setWorkingarea(customer.getWorkingarea());
+        }
+        if (customer.getGrade() != null) {
+            currentCustomer.setGrade(customer.getGrade());
+        }
+        if (customer.hasvalueforopeningamt) {
+            currentCustomer.setOpeningamt(customer.getOpeningamt());
+        }
+        if (customer.hasvalueforoutstandingamt) {
+            currentCustomer.setOutstandingamt(customer.getOutstandingamt());
+        }
+        if (customer.hasvalueforpaymentamt) {
+            currentCustomer.setPaymentamt(customer.getPaymentamt());
+        }
+        if (customer.getAgent() != null) {
+            currentCustomer.setAgent(customer.getAgent());
+        }
+        if (customer.getPhone() != null) {
+            currentCustomer.setPhone(customer.getPhone());
+        }
+        if (customer.hasvalueforreceiveamt) {
+            currentCustomer.setReceiveamt(customer.getReceiveamt());
+        }
+
+        currentCustomer.getOrders().clear();
+        for (Order o : customer.getOrders()) {
+            Order newOrder = new Order(o.getOrdamount(), o.getAdvanceamount(), currentCustomer, o.getOrderdescription());
+            newOrder.setPayments(o.getPayments());
+            currentCustomer.getOrders().add(newOrder);
+        }
+        return custrepos.save(currentCustomer);
+    }
+
+    @Transactional
+    @Override
+    public void delete(long id) {
+        if (custrepos.findById(id).isPresent()) {
+            custrepos.deleteById(id);
+        } else {
+            throw new EntityNotFoundException("Customer " + id + " Not Found!");
+        }
+    }
 }
