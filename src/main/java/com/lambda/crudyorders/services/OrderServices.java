@@ -12,4 +12,6 @@ public interface OrderServices {
     List<Order> findAdvanceAmount();
 
     Order save(Order order);
+
+    void delete(long id);
 }
